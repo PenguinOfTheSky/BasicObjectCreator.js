@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<style>
+  html {
+    height: 100%;
+  }
+  body {
+    min-height: 100%;
+  }
+</style>
+
+<textarea id = 'mainText' style='width: 100%; height: 550px;'></textarea>
+See Dev Console.
+<script>
+  console.log("type help() in console for help")
+  window.help = function() {
+    console.log("Available commands:\n" +
+      "print(obj) : prints object to textarea\n" +
+      "printJSON(obj) : prints json object \n" +
+      "read() : returns object from textarea.  use like this: let foo = read() \n" +
+      "readJSON() : returns json object from textarea \n" +
+      "There's also a version of this that involves backend grabbing/saving files but I figured " +
+      "that a simple version with no dependencies would be better to start of with.  You can copy/paste into" +
+      "editor of your choice then back to textarea.  If y'all desire backend version shout it out."
+      )
+  }
+  window.printJSON = function(obj) {
+    document.querySelector('#mainText').innerHTML = JSON.stringify(obj, null, 2)
+  }
+  window.print =  function( obj ) {
+
+  var str = '';
+  var collectArray = function(obj, level, name) {
+    let innerString = '['
+    for (let i = 0; i < obj.length; i++) {
+      if (typeof(obj[i]) == 'string') innerString += '"' + obj[i] + '"'
+      else if (typeof(obj[i]) == 'number') innerString += obj[i]
+      else if (typeof(obj[i]) == 'object' && Array.isArray(obj[i]) == false) innerString += collectObject(obj[i], level + 2)
+      if (i < obj.length -1) innerString += ','
+    }
+    innerString += ']'
+    return innerString;
+  }
+  var collectObject = function(obj, level, name) {
+    let spaces = ''
+    for (let i = level; i > 0; i--) {
+      spaces += ' '
+    }
+    var levelStr = '{\n';
+    let objKeys = Object.keys(obj).forEach(function(p, indexVal, arr) {
+      levelStr += spaces + '  "' + p + '" : '
+      if (typeof(obj[p]) != 'object') {
+        if (typeof(obj[p]) == 'string') {
+          levelStr += '"' + obj[p] + '"'
+        } else {
+          levelStr += obj[p]
+        }
+      } else {
+        if (Array.isArray(obj[p]) == false) {
+          levelStr +=  collectObject(obj[p], level + 2)
+        } else {
+          levelStr += collectArray(obj[p], level + 2)
+        }
+      }
+      if (indexVal != arr.length -1) levelStr += ','
+      levelStr += '\n'
+    })
+    levelStr += spaces + '}'
+    return levelStr;
+  }
+  str += collectObject(obj, 0)
+  document.querySelector('#mainText').innerHTML =  str;
+  };
+  window.readJSON = function() {
+    return JSON.parse(document.querySelector('#mainText').value)
+  }
+  window.read = function() {
+    return eval('(' + document.querySelector('#mainText').value + ')')
+  }
+</script>

@@ -34,11 +34,21 @@ See Dev Console.
   var str = '';
   var collectArray = function(obj, level, name) {
     let innerString = '['
-    for (let i = 0; i < obj.length; i++) {
-      if (typeof(obj[i]) == 'string') innerString += '"' + obj[i] + '"'
-      else if (typeof(obj[i]) == 'number') innerString += obj[i]
-      else if (typeof(obj[i]) == 'object' && Array.isArray(obj[i]) == false) innerString += collectObject(obj[i], level + 2)
-      if (i < obj.length -1) innerString += ','
+    for (let p = 0; p < obj.length; p++) {
+      if (typeof(obj[p]) != 'object') {
+        if (typeof(obj[p]) == 'string') {
+          innerString += '"' + obj[p] + '"'
+        } else {
+          innerString += obj[p]
+        }
+      } else {
+        if (Array.isArray(obj[p]) == false) {
+          innerString +=  collectObject(obj[p], level + 2)
+        } else {
+          innerString += collectArray(obj[p], level + 2)
+        }
+      }
+      if (p < obj.length -1) innerString += ','
     }
     innerString += ']'
     return innerString;
@@ -70,7 +80,8 @@ See Dev Console.
     levelStr += spaces + '}'
     return levelStr;
   }
-  str += collectObject(obj, 0)
+  if (Array.isArray(obj)) str += collectArray(obj, 0)
+  else str += collectObject(obj, 0)
   document.querySelector('#mainText').innerHTML =  str;
   };
   window.readJSON = function() {
